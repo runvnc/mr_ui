@@ -96,21 +96,21 @@ async def add_available_components(data: dict, context=None) -> dict:
 
 
 @command()
-async def create_component(name: str, text: str, context=None) -> dict:
+async def create_component(component_name: str, text: str, context=None) -> dict:
     """Create or update a custom UI web component.
     
-    The component JS file will be saved to /data/ui/{name}.js and automatically
-    loaded on the chat page. You can then use <{name}></{name}> in responses.
+    The component JS file will be saved to /data/ui/{component_name}.js and automatically
+    loaded on the chat page. You can then use <{component_name}></{component_name}> in responses.
     
     Args:
-        name: Component name (lowercase with hyphens, e.g. 'customer-list')
+        component_name: Component name (lowercase with hyphens, e.g. 'customer-list')
         text: The JavaScript code defining the web component
     
     The code should define a class extending HTMLElement and register it:
     
     Example:
     { "create_component": { 
-        "name": "greeting-card",
+        "component_name": "greeting-card",
         "text": "/* A simple greeting card */\nclass GreetingCard extends HTMLElement {\n  connectedCallback() {\n    const name = this.getAttribute('name') || 'World';\n    this.innerHTML = `<div style='padding:1rem;border:1px solid #444;border-radius:8px;'><h2>Hello, ${name}!</h2></div>`;\n  }\n}\ncustomElements.define('greeting-card', GreetingCard);"
     }}
     
@@ -120,26 +120,26 @@ async def create_component(name: str, text: str, context=None) -> dict:
     Returns:
         dict: Status and component info
     """
-    # Validate name (must be valid custom element name)
-    if not name or not isinstance(name, str):
+    # Validate component_name (must be valid custom element name)
+    if not component_name or not isinstance(component_name, str):
         return {"status": "error", "message": "Name is required"}
     
-    name = name.lower().strip()
-    if not '-' in name:
+    component_name = component_name.lower().strip()
+    if not '-' in component_name:
         return {"status": "error", "message": "Component name must contain a hyphen (e.g. 'my-component')"}
     
-    if not name.replace('-', '').isalnum():
+    if not component_name.replace('-', '').isalnum():
         return {"status": "error", "message": "Component name must be alphanumeric with hyphens only"}
     
     # Save the component
-    path = f"{DATA_UI_DIR}/{name}.js"
+    path = f"{DATA_UI_DIR}/{component_name}.js"
     try:
         with open(path, 'w') as f:
             f.write(text)
         
         return {
             "status": "success", 
-            "message": f"Component '{name}' saved. Use <{name}></{name}> in responses.",
+            "message": f"Component '{component_name}' saved. Use <{component_name}></{component_name}> in responses.",
             "path": path
         }
     except Exception as e:
@@ -165,45 +165,45 @@ async def list_components(context=None) -> dict:
 
 
 @command()
-async def delete_component(name: str, context=None) -> dict:
+async def delete_component(component_name: str, context=None) -> dict:
     """Delete a custom UI component.
     
     Args:
-        name: The component name to delete
+        component_name: The component name to delete
     
     Returns:
         dict: Status of deletion
     """
-    path = f"{DATA_UI_DIR}/{name}.js"
+    path = f"{DATA_UI_DIR}/{component_name}.js"
     if not os.path.exists(path):
-        return {"status": "error", "message": f"Component '{name}' not found"}
+        return {"status": "error", "message": f"Component '{component_name}' not found"}
     
     try:
         os.remove(path)
-        return {"status": "success", "message": f"Component '{name}' deleted"}
+        return {"status": "success", "message": f"Component '{component_name}' deleted"}
     except Exception as e:
         logger.error(f"Failed to delete component: {str(e)}")
         return {"status": "error", "message": str(e)}
 
 
 @command()
-async def read_component(name: str, context=None) -> dict:
+async def read_component(component_name: str, context=None) -> dict:
     """Read the source code of a custom UI component.
     
     Args:
-        name: The component name to read
+        component_name: The component name to read
     
     Returns:
         dict: Component name and source code
     """
-    path = f"{DATA_UI_DIR}/{name}.js"
+    path = f"{DATA_UI_DIR}/{component_name}.js"
     if not os.path.exists(path):
-        return {"status": "error", "message": f"Component '{name}' not found"}
+        return {"status": "error", "message": f"Component '{component_name}' not found"}
     
     try:
         with open(path, 'r') as f:
             content = f.read()
-        return {"name": name, "text": content}
+        return {"name": component_name, "text": content}
     except Exception as e:
         logger.error(f"Failed to read component: {str(e)}")
         return {"status": "error", "message": str(e)}

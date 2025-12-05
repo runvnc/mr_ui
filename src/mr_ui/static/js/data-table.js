@@ -22,6 +22,21 @@ class DataTable extends HTMLElement {
     }
   }
 
+  formatValue(val) {
+    if (val === null || val === undefined) {
+      return '';
+    }
+    if (typeof val === 'object') {
+      // If it's an array, join values
+      if (Array.isArray(val)) {
+        return val.map(v => this.formatValue(v)).join(', ');
+      }
+      // If it's an object, extract values and join
+      return Object.values(val).map(v => this.formatValue(v)).join(', ');
+    }
+    return String(val);
+  }
+
   createTable(data) {
     if (!Array.isArray(data) || data.length === 0) {
       this.innerHTML = '<p>No data to display.</p>';
@@ -40,7 +55,7 @@ class DataTable extends HTMLElement {
     data.forEach(row => {
       tableHTML += '<tr>';
       headers.forEach(header => {
-        tableHTML += `<td>${row[header] !== undefined ? row[header] : ''}</td>`;
+        tableHTML += `<td>${this.formatValue(row[header])}</td>`;
       });
       tableHTML += '</tr>';
     });

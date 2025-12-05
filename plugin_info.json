@@ -1,7 +1,7 @@
 {
   "name": "MR UI Components",
   "version": "1.0.0",
-  "description": "UI web components for chat interface including data-table and chat-menu",
+  "description": "UI web components for chat interface including data-table, chat-menu, and dynamic component creation",
   "services": [],
-  "commands": []
+  "commands": ["create_component", "list_components", "delete_component", "read_component"]
 }

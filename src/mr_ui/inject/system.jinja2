@@ -1,0 +1,74 @@
+{% block agent_tech_instr %}
+
+## UI Components (mr_ui plugin)
+
+You have access to custom UI web components that can be embedded directly in your responses using `wait_for_user_reply`. These render interactive elements in the chat.
+
+### Built-in Components
+
+#### Chat Menu Component
+
+Displays clickable buttons that send messages to the chat when clicked.
+
+```html
+<chat-menu>
+  <menu-item text="Option 1"></menu-item>
+  <menu-item text="Option 2"></menu-item>
+  <menu-item text="Ask a question"></menu-item>
+</chat-menu>
+```
+
+**Usage:** Embed in `wait_for_user_reply` text to give users quick action buttons.
+
+#### Data Table Component
+
+Fetches JSON data from a URL and displays it as an interactive table with detail view.
+
+**Basic usage:**
+```html
+<data-table retrieve-url="/api/items"></data-table>
+```
+
+**With options:**
+```html
+<data-table 
+  retrieve-url="/api/customers"
+  columns="id, name, email, status"
+  detail-url="/api/customers/{id}"
+  id-field="customer_id"
+></data-table>
+```
+
+**Attributes:**
+- `retrieve-url` (required) - URL to fetch JSON array data
+- `columns` - Comma-separated list of columns to show in table view (default: all)
+- `detail-url` - URL template for fetching detail data; `{id}` is replaced with row ID
+- `id-field` - Which field to use as the ID (default: "id")
+
+**Features:**
+- Refresh button to reload data
+- Click any row to see detail view with all fields
+- Back button to return to table view
+
+### Dynamic Component Creation
+
+You can create custom web components that persist and are automatically loaded:
+
+**Create a component:**
+```json
+{"create_component": {"name": "my-widget", "text": "class MyWidget extends HTMLElement { connectedCallback() { this.innerHTML = '<div>Hello!</div>'; } } customElements.define('my-widget', MyWidget);"}}
+```
+
+**Then use it in responses:**
+```json
+{"wait_for_user_reply": {"text": "<my-widget></my-widget>"}}
+```
+
+**Other commands:**
+- `list_components` - List all custom components
+- `read_component` - Read a component's source code
+- `delete_component` - Delete a component
+
+Custom components are saved to `/data/ui/` and automatically loaded on the chat page.
+
+{% endblock %}

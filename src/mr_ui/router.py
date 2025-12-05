@@ -10,19 +10,6 @@ router = APIRouter(prefix="/mr_ui")
 DATA_UI_DIR = "data/ui"
 
 
-@router.get("/components/{name}.js")
-async def get_component(name: str):
-    """Serve a custom component JS file."""
-    # Sanitize name
-    name = name.replace('/', '').replace('\\', '').replace('..', '')
-    path = f"{DATA_UI_DIR}/{name}.js"
-    
-    if not os.path.exists(path):
-        return Response(f"// Component '{name}' not found", status_code=404, media_type="application/javascript")
-    
-    return FileResponse(path, media_type="application/javascript")
-
-
 @router.get("/components/all.js")
 async def get_all_components():
     """Serve all custom components concatenated into a single JS file."""
@@ -47,6 +34,19 @@ async def get_all_components():
             content += f"// Error loading {name}: {e}\n\n"
     
     return Response(content, media_type="application/javascript")
+
+
+@router.get("/components/{name}.js")
+async def get_component(name: str):
+    """Serve a custom component JS file."""
+    # Sanitize name
+    name = name.replace('/', '').replace('\\', '').replace('..', '')
+    path = f"{DATA_UI_DIR}/{name}.js"
+    
+    if not os.path.exists(path):
+        return Response(f"// Component '{name}' not found", status_code=404, media_type="application/javascript")
+    
+    return FileResponse(path, media_type="application/javascript")
 
 
 @router.get("/api/components")

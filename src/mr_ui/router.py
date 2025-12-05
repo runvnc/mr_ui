@@ -23,23 +23,28 @@ async def get_component(name: str):
     return FileResponse(path, media_type="application/javascript")
 
 
-@router.get("/components/loader.js")
-async def get_loader():
-    """Generate a JS module that imports all available components."""
+@router.get("/components/all.js")
+async def get_all_components():
+    """Serve all custom components concatenated into a single JS file."""
     files = glob.glob(f"{DATA_UI_DIR}/*.js")
     
     if not files:
         return Response("// No custom components available", media_type="application/javascript")
     
-    # Generate import statements
-    imports = []
+    # Concatenate all component files
+    content = "// Auto-generated bundle of all custom UI components\n"
+    content += "// Components from /data/ui/\n\n"
+    
     for f in files:
         name = Path(f).stem
-        imports.append(f"import '/mr_ui/components/{name}.js';")
-    
-    content = "// Auto-generated loader for custom UI components\n"
-    content += "// Components from /data/ui/\n\n"
-    content += "\n".join(imports)
+        try:
+            with open(f, 'r') as file:
+                component_code = file.read()
+            content += f"// === Component: {name} ===\n"
+            content += component_code
+            content += "\n\n"
+        except Exception as e:
+            content += f"// Error loading {name}: {e}\n\n"
     
     return Response(content, media_type="application/javascript")
 

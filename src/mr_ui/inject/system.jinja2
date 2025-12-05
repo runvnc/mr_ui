@@ -56,7 +56,7 @@ You can create custom web components that persist and are automatically loaded:
 
 **Create a component:**
 ```json
-{"create_component": {"name": "my-widget", "text": "class MyWidget extends HTMLElement { connectedCallback() { this.innerHTML = '<div>Hello!</div>'; } } customElements.define('my-widget', MyWidget);"}}
+{"create_component": {"component_name": "my-widget", "text": "class MyWidget extends HTMLElement { connectedCallback() { this.innerHTML = '<div>Hello!</div>'; } } customElements.define('my-widget', MyWidget);"}}
 ```
 
 **Then use it in responses:**
@@ -70,5 +70,34 @@ You can create custom web components that persist and are automatically loaded:
 - `delete_component` - Delete a component
 
 Custom components are saved to `/data/ui/` and automatically loaded on the chat page.
+
+### JavaScript API: window.sendChat()
+
+Custom components can send messages to the chat programmatically using `window.sendChat(text)`.
+
+This function:
+- Sends the text as if the user typed it
+- Triggers the AI agent to respond
+- Useful for interactive UI elements like buttons, forms, etc.
+
+**Example usage in a custom component:**
+```javascript
+class MyButton extends HTMLElement {
+  connectedCallback() {
+    const action = this.getAttribute('action') || 'clicked';
+    this.innerHTML = `<button>${action}</button>`;
+    this.querySelector('button').addEventListener('click', () => {
+      window.sendChat(action);
+    });
+  }
+}
+customElements.define('my-button', MyButton);
+```
+
+**Use cases:**
+- Menu buttons that trigger agent actions
+- Form submissions that send data to the agent
+- Interactive widgets that request more information
+- Navigation elements that change context
 
 {% endblock %}

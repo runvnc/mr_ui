@@ -5,7 +5,7 @@ from pathlib import Path
 from fastapi import APIRouter, Response
 from fastapi.responses import FileResponse
 
-router = APIRouter()
+router = APIRouter(prefix="/mr_ui")
 
 DATA_UI_DIR = "data/ui"
 
